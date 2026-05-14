@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quiniela Güsak</title>
+  <title>La Quiniela</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -60,13 +60,12 @@
 
     .scroll-container {
       overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
     }
 
     table {
+      width: 100%;
       border-collapse: collapse;
       font-size: 14px;
-      /* No width:100% — dejar que el scroll funcione */
     }
 
     thead th {
@@ -79,45 +78,10 @@
       padding: 12px 14px;
       text-align: center;
       white-space: nowrap;
-      position: sticky;
-      top: 0;
-      z-index: 2;
     }
 
     thead th.col-left {
       text-align: left;
-    }
-
-    /* Columnas fijas (barra, #, jugador, pts) */
-    th.sticky, td.sticky {
-      position: sticky;
-      z-index: 1;
-      background: #fff;
-    }
-
-    thead th.sticky {
-      background: #37003c;
-      z-index: 3;
-    }
-
-    td.col-bar.sticky { left: 0; width: 4px; padding: 0; }
-    th.th-bar { left: 0; width: 4px; padding: 0 !important; }
-    td.col-pos.sticky { left: 4px; }
-    th.th-pos { left: 4px; }
-    td.col-name.sticky { left: 44px; }
-    th.th-name { left: 44px; }
-    td.col-pts.sticky { left: 174px; border-right: 2px solid #e8e8e8; }
-    th.th-pts { left: 174px; border-right: 2px solid rgba(255,255,255,0.2); }
-
-    /* Sombra sutil para indicar que hay scroll */
-    td.col-pts.sticky, th.th-pts {
-      box-shadow: 3px 0 6px rgba(0,0,0,0.08);
-    }
-
-    /* Las celdas sticky en filas top/bottom deben heredar el fondo blanco siempre
-       (el color se indica con la barra lateral, no el fondo de fila) */
-    tbody tr:hover td.sticky {
-      background: #fafafa;
     }
 
     tbody tr {
@@ -235,15 +199,10 @@
     }
 
     @media (max-width: 600px) {
-      body { padding: 16px 10px; }
       table { font-size: 12px; }
-      td, thead th { padding: 9px 7px; }
+      td, thead th { padding: 9px 8px; }
+      .avatar { display: none; }
       header h1 { font-size: 18px; }
-      .avatar { width: 26px; height: 26px; font-size: 9px; }
-      td.col-name.sticky { left: 38px; max-width: 110px; overflow: hidden; text-overflow: ellipsis; }
-      th.th-name { left: 38px; }
-      td.col-pts.sticky { left: 155px; }
-      th.th-pts { left: 155px; }
     }
   </style>
 </head>
@@ -311,10 +270,10 @@
         // Cabecera
         const cab = document.getElementById('cabecera');
         cab.innerHTML = `<tr>
-          <th class="sticky th-bar" style="width:4px;padding:0;"></th>
-          <th class="col-left sticky th-pos" style="width:36px;">#</th>
-          <th class="col-left sticky th-name">Jugador</th>
-          <th class="col-pts-h sticky th-pts">Pts</th>
+          <th style="width:4px;padding:0;background:#37003c;"></th>
+          <th class="col-left" style="width:36px;">#</th>
+          <th class="col-left">Jugador</th>
+          <th class="col-pts-h">Pts</th>
           ${jornHeaders.map(h => `<th>${h}</th>`).join('')}
         </tr>`;
 
@@ -336,15 +295,15 @@
 
           tbody.innerHTML += `
             <tr class="${clase}${sepClass}">
-              <td class="col-bar sticky"></td>
-              <td class="col-pos sticky">${pos}</td>
-              <td class="col-name sticky">
+              <td class="col-bar"></td>
+              <td class="col-pos">${pos}</td>
+              <td class="col-name">
                 <div class="player-cell">
                   <div class="avatar" style="background:${color}">${initials(j.nombre)}</div>
                   <span>${j.nombre}</span>
                 </div>
               </td>
-              <td class="col-pts sticky">${j.puntos}</td>
+              <td class="col-pts">${j.puntos}</td>
               ${jornadasHTML}
             </tr>
           `;
