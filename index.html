@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>La Quiniela</title>
+  <title>Quiniela Güsak</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,6 +30,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
 
     .logo svg {
@@ -51,19 +52,35 @@
       margin-top: 2px;
     }
 
-    .table-wrapper {
+    /* ── Contenedor principal ── */
+    .tabla-contenedor {
+      display: flex;
+      align-items: flex-start;
       background: #fff;
       border-radius: 8px;
-      overflow: hidden;
       box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      overflow: hidden;
     }
 
-    .scroll-container {
+    /* ── Tabla FIJA (izquierda) ── */
+    .tabla-fija {
+      flex-shrink: 0;
+      /* Sombra derecha para indicar scroll */
+      box-shadow: 3px 0 8px rgba(0,0,0,0.10);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Tabla SCROLL (derecha) ── */
+    .tabla-scroll {
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      flex: 1;
+      min-width: 0;
     }
 
+    /* ── Tablas en común ── */
     table {
-      width: 100%;
       border-collapse: collapse;
       font-size: 14px;
     }
@@ -80,10 +97,6 @@
       white-space: nowrap;
     }
 
-    thead th.col-left {
-      text-align: left;
-    }
-
     tbody tr {
       border-bottom: 1px solid #f0f0f0;
       transition: background 0.15s;
@@ -98,38 +111,48 @@
     }
 
     td {
-      padding: 12px 14px;
+      padding: 11px 14px;
       text-align: center;
       white-space: nowrap;
       color: #1a1a1a;
+    }
+
+    /* ── Columnas de la tabla fija ── */
+    td.col-bar {
+      padding: 0;
+      width: 4px;
     }
 
     td.col-pos {
       font-weight: 700;
       font-size: 13px;
       color: #888;
-      width: 36px;
+      width: 32px;
     }
 
     td.col-name {
       text-align: left;
       font-weight: 600;
       font-size: 14px;
-      color: #1a1a1a;
       padding-left: 0;
     }
 
     td.col-pts {
       font-weight: 700;
       font-size: 15px;
-      color: #1a1a1a;
       width: 52px;
+      border-right: none; /* el box-shadow del contenedor hace de separador */
     }
 
+    th.col-pts-h {
+      background: #4a0057;
+    }
+
+    /* ── Columnas de jornadas ── */
     td.col-j {
       font-size: 13px;
       color: #444;
-      min-width: 38px;
+      min-width: 42px;
     }
 
     td.np {
@@ -137,38 +160,7 @@
       font-style: italic;
     }
 
-    /* Línea de color según posición */
-    td.col-bar {
-      padding: 0;
-      width: 4px;
-    }
-
-    tr.top-1 td.col-bar { background: #00cc44; }
-    tr.top-2 td.col-bar { background: #00cc44; }
-    tr.top-3 td.col-bar { background: #00cc44; }
-    tr.top-4 td.col-bar { background: #00cc44; }
-    tr.mid td.col-bar { background: transparent; }
-    tr.bottom-1 td.col-bar { background: #e63312; }
-    tr.bottom-2 td.col-bar { background: #e63312; }
-    tr.bottom-3 td.col-bar { background: #e63312; }
-    tr.bottom-4 td.col-bar { background: #e63312; }
-
-    /* Badge de posición para top/bottom */
-    tr.top-1 td.col-pts,
-    tr.top-2 td.col-pts,
-    tr.top-3 td.col-pts,
-    tr.top-4 td.col-pts {
-      color: #1a7a1a;
-    }
-
-    tr.bottom-1 td.col-pts,
-    tr.bottom-2 td.col-pts,
-    tr.bottom-3 td.col-pts,
-    tr.bottom-4 td.col-pts {
-      color: #cc2200;
-    }
-
-    /* Avatar del jugador */
+    /* ── Avatar ── */
     .player-cell {
       display: flex;
       align-items: center;
@@ -179,6 +171,7 @@
       width: 32px;
       height: 32px;
       border-radius: 50%;
+      object-fit: cover;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -188,21 +181,43 @@
       color: #fff;
     }
 
-    /* Separador visual entre top y bottom */
+    /* ── Barra lateral de color ── */
+    tr.top-1 td.col-bar,
+    tr.top-2 td.col-bar,
+    tr.top-3 td.col-bar,
+    tr.top-4 td.col-bar { background: #00cc44; }
+
+    tr.bottom-1 td.col-bar,
+    tr.bottom-2 td.col-bar,
+    tr.bottom-3 td.col-bar,
+    tr.bottom-4 td.col-bar { background: #e63312; }
+
+    /* ── Color de puntos top/bottom ── */
+    tr.top-1 td.col-pts,
+    tr.top-2 td.col-pts,
+    tr.top-3 td.col-pts,
+    tr.top-4 td.col-pts { color: #1a7a1a; }
+
+    tr.bottom-1 td.col-pts,
+    tr.bottom-2 td.col-pts,
+    tr.bottom-3 td.col-pts,
+    tr.bottom-4 td.col-pts { color: #cc2200; }
+
+    /* ── Separador entre top y mid ── */
     tr.separator td {
       border-top: 2px dashed #e0e0e0;
     }
 
-    /* Columna puntos — resalte */
-    th.col-pts-h {
-      background: #4a0057;
-    }
+    /* ── Sincronizar altura de filas entre las dos tablas ── */
+    /* Se hace desde JS después de renderizar */
 
     @media (max-width: 600px) {
+      body { padding: 16px 10px; }
       table { font-size: 12px; }
-      td, thead th { padding: 9px 8px; }
-      .avatar { display: none; }
+      td, thead th { padding: 9px 7px; }
       header h1 { font-size: 18px; }
+      .avatar { width: 26px; height: 26px; font-size: 9px; }
+      td.col-name { max-width: 100px; overflow: hidden; text-overflow: ellipsis; }
     }
   </style>
 </head>
@@ -220,11 +235,17 @@
     </div>
   </header>
 
-  <div class="table-wrapper">
-    <div class="scroll-container">
-      <table id="tabla">
-        <thead id="cabecera"></thead>
-        <tbody id="cuerpo"></tbody>
+  <div class="tabla-contenedor">
+    <div class="tabla-fija">
+      <table>
+        <thead id="cabecera-fija"></thead>
+        <tbody id="datos-fija"></tbody>
+      </table>
+    </div>
+    <div class="tabla-scroll">
+      <table>
+        <thead id="cabecera-scroll"></thead>
+        <tbody id="datos-scroll"></tbody>
       </table>
     </div>
   </div>
@@ -240,6 +261,17 @@
 
     function initials(name) {
       return name.trim().substring(0, 2).toUpperCase();
+    }
+
+    // Construye el HTML del avatar: imagen si existe, fallback a iniciales
+    function avatarHTML(nombre, color) {
+      const src = `avatars/${nombre.trim().toLowerCase()}.jpg`;
+      return `<img
+        class="avatar"
+        src="${src}"
+        alt="${nombre}"
+        onerror="this.outerHTML='<div class=\\'avatar\\' style=\\'background:${color}\\'>${initials(nombre)}</div>'"
+      />`;
     }
 
     fetch(urlCSV)
@@ -263,22 +295,24 @@
         const jornHeaders = headers.slice(2);
         const n = jugadores.length;
 
-        // Subtítulo
         document.getElementById('subtitulo').textContent =
           `${n} jugadores · Jornada actual: ${jornHeaders[jornHeaders.length - 1] || '—'}`;
 
-        // Cabecera
-        const cab = document.getElementById('cabecera');
-        cab.innerHTML = `<tr>
-          <th style="width:4px;padding:0;background:#37003c;"></th>
-          <th class="col-left" style="width:36px;">#</th>
-          <th class="col-left">Jugador</th>
-          <th class="col-pts-h">Pts</th>
-          ${jornHeaders.map(h => `<th>${h}</th>`).join('')}
-        </tr>`;
+        // Cabeceras
+        document.getElementById('cabecera-fija').innerHTML = `
+          <tr>
+            <th style="width:4px;padding:0;"></th>
+            <th style="width:32px;">#</th>
+            <th style="text-align:left;">Jugador</th>
+            <th class="col-pts-h">Pts</th>
+          </tr>`;
 
-        // Filas
-        const tbody = document.getElementById('cuerpo');
+        document.getElementById('cabecera-scroll').innerHTML =
+          `<tr>${jornHeaders.map(h => `<th>${h}</th>`).join('')}</tr>`;
+
+        const tbodyFija   = document.getElementById('datos-fija');
+        const tbodyScroll = document.getElementById('datos-scroll');
+
         jugadores.forEach((j, i) => {
           const pos = i + 1;
           let clase = 'mid';
@@ -293,25 +327,55 @@
             return `<td class="col-j${isNP ? ' np' : ''}">${v || '—'}</td>`;
           }).join('');
 
-          tbody.innerHTML += `
+          tbodyFija.innerHTML += `
             <tr class="${clase}${sepClass}">
               <td class="col-bar"></td>
               <td class="col-pos">${pos}</td>
               <td class="col-name">
                 <div class="player-cell">
-                  <div class="avatar" style="background:${color}">${initials(j.nombre)}</div>
+                  ${avatarHTML(j.nombre, color)}
                   <span>${j.nombre}</span>
                 </div>
               </td>
               <td class="col-pts">${j.puntos}</td>
+            </tr>`;
+
+          tbodyScroll.innerHTML += `
+            <tr class="${clase}${sepClass}">
               ${jornadasHTML}
-            </tr>
-          `;
+            </tr>`;
         });
+
+        // Sincronizar alturas de filas entre las dos tablas
+        syncRowHeights();
       })
       .catch(() => {
         document.getElementById('subtitulo').textContent = 'Error al cargar los datos.';
       });
+
+    function syncRowHeights() {
+      // Cabeceras
+      const thFija   = document.querySelectorAll('#cabecera-fija tr');
+      const thScroll = document.querySelectorAll('#cabecera-scroll tr');
+      thFija.forEach((row, i) => {
+        if (thScroll[i]) {
+          const h = Math.max(row.offsetHeight, thScroll[i].offsetHeight);
+          row.style.height = h + 'px';
+          thScroll[i].style.height = h + 'px';
+        }
+      });
+
+      // Filas de datos
+      const trFija   = document.querySelectorAll('#datos-fija tr');
+      const trScroll = document.querySelectorAll('#datos-scroll tr');
+      trFija.forEach((row, i) => {
+        if (trScroll[i]) {
+          const h = Math.max(row.offsetHeight, trScroll[i].offsetHeight);
+          row.style.height = h + 'px';
+          trScroll[i].style.height = h + 'px';
+        }
+      });
+    }
   </script>
 </body>
 </html>
