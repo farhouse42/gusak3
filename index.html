@@ -66,7 +66,6 @@
     table {
       border-collapse: collapse;
       font-size: 14px;
-      /* No width:100% — dejar que el scroll funcione */
     }
 
     thead th {
@@ -88,11 +87,31 @@
       text-align: left;
     }
 
-    /* Columnas fijas (barra, #, jugador, pts) */
+    /* ─── STICKY COLUMNS ─────────────────────────────────────────────
+       La clave: las celdas td.sticky SIEMPRE tienen background propio.
+       Nunca lo heredan de la fila, así tapan el contenido que pasa por detrás.
+    ──────────────────────────────────────────────────────────────── */
     th.sticky, td.sticky {
       position: sticky;
       z-index: 1;
+    }
+
+    /* Fondo por defecto para celdas sticky del body */
+    tbody td.sticky {
       background: #fff;
+    }
+
+    /* Fondo hover — se aplica sobre la celda sticky directamente,
+       no sobre la fila, para que prevalezca */
+    tbody tr:hover td.sticky {
+      background: #fafafa;
+    }
+
+    /* La barra de color lateral es una celda sticky de 4px;
+       su color de fondo lo sobreescribimos con las clases tr.top-N / tr.bottom-N
+       PERO solo para la barra (col-bar), no para las demás sticky */
+    tbody td.col-bar.sticky {
+      background: transparent; /* la barra en sí no necesita tapar nada */
     }
 
     thead th.sticky {
@@ -100,24 +119,18 @@
       z-index: 3;
     }
 
-    td.col-bar.sticky { left: 0; width: 4px; padding: 0; }
-    th.th-bar { left: 0; width: 4px; padding: 0 !important; }
-    td.col-pos.sticky { left: 4px; }
-    th.th-pos { left: 4px; }
-    td.col-name.sticky { left: 44px; }
-    th.th-name { left: 44px; }
-    td.col-pts.sticky { left: 174px; border-right: 2px solid #e8e8e8; }
-    th.th-pts { left: 174px; border-right: 2px solid rgba(255,255,255,0.2); }
-
-    /* Sombra sutil para indicar que hay scroll */
+    /* Posiciones de las columnas fijas */
+    td.col-bar.sticky, th.th-bar { left: 0; width: 4px; padding: 0; }
+    td.col-pos.sticky, th.th-pos { left: 4px; }
+    td.col-name.sticky, th.th-name { left: 44px; }
     td.col-pts.sticky, th.th-pts {
+      left: 174px;
+      border-right: 2px solid #e8e8e8;
       box-shadow: 3px 0 6px rgba(0,0,0,0.08);
     }
-
-    /* Las celdas sticky en filas top/bottom deben heredar el fondo blanco siempre
-       (el color se indica con la barra lateral, no el fondo de fila) */
-    tbody tr:hover td.sticky {
-      background: #fafafa;
+    thead th.th-pts {
+      border-right: 2px solid rgba(255,255,255,0.2);
+      box-shadow: 3px 0 6px rgba(0,0,0,0.15);
     }
 
     tbody tr {
@@ -129,6 +142,7 @@
       border-bottom: none;
     }
 
+    /* El hover de la fila sigue funcionando para las celdas NO sticky */
     tbody tr:hover {
       background: #fafafa;
     }
@@ -173,7 +187,6 @@
       font-style: italic;
     }
 
-    /* Línea de color según posición */
     td.col-bar {
       padding: 0;
       width: 4px;
@@ -189,7 +202,6 @@
     tr.bottom-3 td.col-bar { background: #e63312; }
     tr.bottom-4 td.col-bar { background: #e63312; }
 
-    /* Badge de posición para top/bottom */
     tr.top-1 td.col-pts,
     tr.top-2 td.col-pts,
     tr.top-3 td.col-pts,
@@ -204,7 +216,6 @@
       color: #cc2200;
     }
 
-    /* Avatar del jugador */
     .player-cell {
       display: flex;
       align-items: center;
@@ -224,12 +235,10 @@
       color: #fff;
     }
 
-    /* Separador visual entre top y bottom */
     tr.separator td {
       border-top: 2px dashed #e0e0e0;
     }
 
-    /* Columna puntos — resalte */
     th.col-pts-h {
       background: #4a0057;
     }
@@ -304,11 +313,9 @@
         const jornHeaders = headers.slice(2);
         const n = jugadores.length;
 
-        // Subtítulo
         document.getElementById('subtitulo').textContent =
           `${n} jugadores · Jornada actual: ${jornHeaders[jornHeaders.length - 1] || '—'}`;
 
-        // Cabecera
         const cab = document.getElementById('cabecera');
         cab.innerHTML = `<tr>
           <th class="sticky th-bar" style="width:4px;padding:0;"></th>
@@ -318,7 +325,6 @@
           ${jornHeaders.map(h => `<th>${h}</th>`).join('')}
         </tr>`;
 
-        // Filas
         const tbody = document.getElementById('cuerpo');
         jugadores.forEach((j, i) => {
           const pos = i + 1;
