@@ -2,380 +2,431 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quiniela Güsak</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test OPE — Contador de Aciertos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #f4f4f2;
+      --text: #1a1a1a;
+      --text-secondary: #6b6b68;
+      --text-tertiary: #9b9b97;
+      --border: rgba(0,0,0,0.12);
+      --border-secondary: rgba(0,0,0,0.22);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --green: #1D9E75;
+      --green-bg: #E1F5EE;
+      --green-dark: #0F6E56;
+      --red: #D85A30;
+      --red-bg: #FAECE7;
+      --red-dark: #993C1D;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1c1a;
+        --bg-secondary: #2a2a28;
+        --text: #f0efe8;
+        --text-secondary: #a0a09a;
+        --text-tertiary: #6b6b65;
+        --border: rgba(255,255,255,0.1);
+        --border-secondary: rgba(255,255,255,0.2);
+        --green: #5DCAA5;
+        --green-bg: #04342C;
+        --green-dark: #9FE1CB;
+        --red: #F0997B;
+        --red-bg: #4A1B0C;
+        --red-dark: #F5C4B3;
+      }
+    }
+
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f5f5f5;
-      color: #1a1a1a;
-      padding: 32px 20px;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-
-    .logo {
-      width: 48px;
-      height: 48px;
-      background: #37003c;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .logo svg {
-      width: 28px;
-      height: 28px;
-      fill: #00ff85;
-    }
-
-    header h1 {
-      font-size: 22px;
-      font-weight: 700;
-      color: #37003c;
-      letter-spacing: -0.3px;
-    }
-
-    header p {
-      font-size: 13px;
-      color: #888;
-      margin-top: 2px;
-    }
-
-    /* ── Contenedor principal ── */
-    .tabla-contenedor {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
       display: flex;
       align-items: flex-start;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-      overflow: hidden;
+      justify-content: center;
+      padding: 2rem 1rem 4rem;
     }
 
-    /* ── Tabla FIJA (izquierda) ── */
-    .tabla-fija {
-      flex-shrink: 0;
-      /* Sombra derecha para indicar scroll */
-      box-shadow: 3px 0 8px rgba(0,0,0,0.10);
-      position: relative;
-      z-index: 1;
+    .container {
+      width: 100%;
+      max-width: 520px;
     }
 
-    /* ── Tabla SCROLL (derecha) ── */
-    .tabla-scroll {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      flex: 1;
-      min-width: 0;
-    }
-
-    /* ── Tablas en común ── */
-    table {
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-
-    thead th {
-      background: #37003c;
-      color: #fff;
-      font-weight: 600;
-      font-size: 12px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      padding: 12px 14px;
-      text-align: center;
-      white-space: nowrap;
-    }
-
-    tbody tr {
-      border-bottom: 1px solid #f0f0f0;
-      transition: background 0.15s;
-    }
-
-    tbody tr:last-child {
-      border-bottom: none;
-    }
-
-    tbody tr:hover {
-      background: #fafafa;
-    }
-
-    td {
-      padding: 11px 14px;
-      text-align: center;
-      white-space: nowrap;
-      color: #1a1a1a;
-    }
-
-    /* ── Columnas de la tabla fija ── */
-    td.col-bar {
-      padding: 0;
-      width: 4px;
-    }
-
-    td.col-pos {
-      font-weight: 700;
-      font-size: 13px;
-      color: #888;
-      width: 32px;
-    }
-
-    td.col-name {
-      text-align: left;
-      font-weight: 600;
-      font-size: 14px;
-      padding-left: 0;
-    }
-
-    td.col-pts {
-      font-weight: 700;
-      font-size: 15px;
-      width: 52px;
-      border-right: none; /* el box-shadow del contenedor hace de separador */
-    }
-
-    th.col-pts-h {
-      background: #4a0057;
-    }
-
-    /* ── Columnas de jornadas ── */
-    td.col-j {
-      font-size: 13px;
-      color: #444;
-      min-width: 42px;
-    }
-
-    td.np {
-      color: #bbb;
-      font-style: italic;
-    }
-
-    /* ── Avatar ── */
-    .player-cell {
+    /* Header */
+    .ope-header {
       display: flex;
-      align-items: center;
-      gap: 10px;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 2rem;
     }
 
-    .avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      object-fit: cover;
+    .ope-label {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .score-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 96px;
+      line-height: 1;
+      color: var(--text);
+      letter-spacing: 0.01em;
+    }
+
+    .score-number .score-total {
+      font-size: 36px;
+      color: var(--text-tertiary);
+    }
+
+    .q-current {
+      font-size: 32px;
+      font-weight: 500;
+      line-height: 1.1;
+      text-align: right;
+    }
+
+    .question-counter-text {
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-align: right;
+      margin-top: 4px;
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1rem;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .stat-value.green { color: var(--green); }
+    .stat-value.red   { color: var(--red); }
+
+    /* Progress */
+    .progress-wrap { margin-bottom: 2rem; }
+
+    .progress-bar-bg {
+      background: var(--bg-secondary);
+      border-radius: 100px;
+      height: 8px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: var(--text);
+      transition: width 0.3s ease;
+    }
+
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
+
+    /* Feedback flash */
+    .feedback-flash {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 500;
+      height: 28px;
+      margin-bottom: 0.5rem;
+      transition: opacity 0.3s;
+    }
+
+    .flash-correct { color: var(--green); }
+    .flash-wrong   { color: var(--red); }
+
+    /* Buttons */
+    .buttons-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 1.25rem;
+    }
+
+    .btn {
+      border: 0.5px solid var(--border-secondary);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 10px;
+      transition: background 0.12s, transform 0.1s;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn:active { transform: scale(0.97); }
+
+    .btn-correct { border-color: var(--green); color: var(--green); }
+    .btn-correct:hover { background: var(--green-bg); }
+
+    .btn-wrong { border-color: var(--red); color: var(--red); }
+    .btn-wrong:hover { background: var(--red-bg); }
+
+    .btn-secondary {
+      border-color: var(--border);
+      color: var(--text-secondary);
+      font-size: 13px;
+      padding: 0.7rem;
+      border-radius: var(--radius-md);
+    }
+
+    .btn-secondary:hover { background: var(--bg-secondary); }
+    .btn-secondary:disabled { opacity: 0.4; cursor: default; }
+
+    .actions-row { display: flex; gap: 10px; }
+    .actions-row .btn { flex: 1; }
+
+    /* Done banner */
+    .done-banner {
+      display: none;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .done-banner h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      margin: 0 0 4px;
+      color: var(--text);
+      font-weight: 400;
+    }
+
+    .done-banner p {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .pct-badge {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 4px 14px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .pct-ok  { background: var(--green-bg); color: var(--green-dark); }
+    .pct-bad { background: var(--red-bg);   color: var(--red-dark); }
+
+    /* Keyboard hint */
+    .kbd-hint {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+
+    kbd {
+      display: inline-block;
+      padding: 1px 6px;
+      border: 0.5px solid var(--border-secondary);
+      border-radius: 4px;
+      font-family: monospace;
       font-size: 11px;
-      font-weight: 700;
-      flex-shrink: 0;
-      color: #fff;
-    }
-
-    /* ── Barra lateral de color ── */
-    tr.top-1 td.col-bar,
-    tr.top-2 td.col-bar,
-    tr.top-3 td.col-bar,
-    tr.top-4 td.col-bar { background: #00cc44; }
-
-    tr.bottom-1 td.col-bar,
-    tr.bottom-2 td.col-bar,
-    tr.bottom-3 td.col-bar,
-    tr.bottom-4 td.col-bar { background: #e63312; }
-
-    /* ── Color de puntos top/bottom ── */
-    tr.top-1 td.col-pts,
-    tr.top-2 td.col-pts,
-    tr.top-3 td.col-pts,
-    tr.top-4 td.col-pts { color: #1a7a1a; }
-
-    tr.bottom-1 td.col-pts,
-    tr.bottom-2 td.col-pts,
-    tr.bottom-3 td.col-pts,
-    tr.bottom-4 td.col-pts { color: #cc2200; }
-
-    /* ── Separador entre top y mid ── */
-    tr.separator td {
-      border-top: 2px dashed #e0e0e0;
-    }
-
-    /* ── Sincronizar altura de filas entre las dos tablas ── */
-    /* Se hace desde JS después de renderizar */
-
-    @media (max-width: 600px) {
-      body { padding: 16px 10px; }
-      table { font-size: 12px; }
-      td, thead th { padding: 9px 7px; }
-      header h1 { font-size: 18px; }
-      .avatar { width: 26px; height: 26px; font-size: 9px; }
-      td.col-name { max-width: 100px; overflow: hidden; text-overflow: ellipsis; }
+      color: var(--text-secondary);
     }
   </style>
 </head>
 <body>
+  <div class="container">
 
-  <header>
-    <div class="logo">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7l-9-5z"/>
-      </svg>
+    <div class="ope-header">
+      <div>
+        <div class="ope-label">Aciertos</div>
+        <div class="score-number" id="score-display">
+          0<span class="score-total">/100</span>
+        </div>
+      </div>
+      <div>
+        <div class="ope-label" style="text-align:right">Pregunta</div>
+        <div class="q-current" id="q-num">1</div>
+        <div class="question-counter-text">de 100</div>
+      </div>
     </div>
-    <div>
-      <h1>Quiniela Güsak</h1>
-      <p id="subtitulo">Cargando clasificación…</p>
-    </div>
-  </header>
 
-  <div class="tabla-contenedor">
-    <div class="tabla-fija">
-      <table>
-        <thead id="cabecera-fija"></thead>
-        <tbody id="datos-fija"></tbody>
-      </table>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="ope-label">Aciertos</div>
+        <div class="stat-value green" id="stat-correct">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="ope-label">Errores</div>
+        <div class="stat-value red" id="stat-wrong">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="ope-label">Quedan</div>
+        <div class="stat-value" id="stat-left">100</div>
+      </div>
     </div>
-    <div class="tabla-scroll">
-      <table>
-        <thead id="cabecera-scroll"></thead>
-        <tbody id="datos-scroll"></tbody>
-      </table>
+
+    <div class="progress-wrap">
+      <div class="ope-label">Progreso</div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-labels">
+        <span id="pct-label">0%</span>
+        <span id="pct-correct-label">— aciertos</span>
+      </div>
     </div>
+
+    <div class="done-banner" id="done-banner">
+      <h2>¡Test completado!</h2>
+      <p id="done-text">Has respondido las 100 preguntas.</p>
+      <span class="pct-badge" id="done-badge"></span>
+    </div>
+
+    <div class="feedback-flash" id="flash"></div>
+
+    <div class="buttons-row" id="main-buttons">
+      <button class="btn btn-correct" id="btn-correct" onclick="answer(true)">
+        <i class="ti ti-check" style="font-size:22px" aria-hidden="true"></i>
+        Acierto
+      </button>
+      <button class="btn btn-wrong" id="btn-wrong" onclick="answer(false)">
+        <i class="ti ti-x" style="font-size:22px" aria-hidden="true"></i>
+        Error
+      </button>
+    </div>
+
+    <div class="actions-row">
+      <button class="btn btn-secondary" id="btn-undo" onclick="undoLast()" disabled>
+        <i class="ti ti-arrow-back-up" style="font-size:16px" aria-hidden="true"></i> Deshacer
+      </button>
+      <button class="btn btn-secondary" onclick="resetAll()">
+        <i class="ti ti-refresh" style="font-size:16px" aria-hidden="true"></i> Reiniciar
+      </button>
+    </div>
+
+    <p class="kbd-hint">
+      <kbd>A</kbd> Acierto &nbsp;·&nbsp; <kbd>E</kbd> Error &nbsp;·&nbsp; <kbd>Z</kbd> Deshacer
+    </p>
+
   </div>
 
   <script>
-    const urlCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ-IvFFGYOHR_OxkUBqUIReu9vSb3CJq5B31jH2vGU1zAQ68BqB1FIJRCPXpWMML41GLbxPxoPzKekP/pub?gid=1550608994&single=true&output=csv";
+    const TOTAL = 100;
+    let correct = 0, wrong = 0, history = [];
+    let flashTimer = null;
 
-    const AVATAR_COLORS = [
-      '#37003c','#00529f','#c8102e','#6c1d45','#1b458f',
-      '#DA291C','#003090','#EF0107','#0057B8','#241F20',
-      '#034694','#132257','#7A263A','#FDB913'
-    ];
+    function update() {
+      const answered = correct + wrong;
+      const left = TOTAL - answered;
+      const pct = Math.round((answered / TOTAL) * 100);
+      const pctCorrect = answered > 0 ? Math.round((correct / answered) * 100) : 0;
 
-    function initials(name) {
-      return name.trim().substring(0, 2).toUpperCase();
+      document.getElementById('score-display').innerHTML =
+        correct + '<span class="score-total">/' + TOTAL + '</span>';
+      document.getElementById('q-num').textContent = Math.min(answered + 1, TOTAL);
+      document.getElementById('stat-correct').textContent = correct;
+      document.getElementById('stat-wrong').textContent = wrong;
+      document.getElementById('stat-left').textContent = left;
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('pct-label').textContent = pct + '%';
+      document.getElementById('pct-correct-label').textContent =
+        answered > 0 ? pctCorrect + '% de acierto' : '— aciertos';
+
+      const done = answered >= TOTAL;
+      document.getElementById('main-buttons').style.display = done ? 'none' : 'grid';
+      document.getElementById('done-banner').style.display = done ? 'block' : 'none';
+
+      if (done) {
+        const finalPct = Math.round((correct / TOTAL) * 100);
+        const badge = document.getElementById('done-badge');
+        badge.textContent = finalPct + '% de acierto — ' + correct + ' correctas, ' + wrong + ' errores';
+        badge.className = 'pct-badge ' + (finalPct >= 60 ? 'pct-ok' : 'pct-bad');
+      }
+
+      const undoBtn = document.getElementById('btn-undo');
+      undoBtn.disabled = history.length === 0;
     }
 
-    // Construye el HTML del avatar: imagen si existe, fallback a iniciales
-    function avatarHTML(nombre, color) {
-      const src = `avatars/${nombre.trim().toLowerCase()}.jpg`;
-      return `<img
-        class="avatar"
-        src="${src}"
-        alt="${nombre}"
-        onerror="this.outerHTML='<div class=\\'avatar\\' style=\\'background:${color}\\'>${initials(nombre)}</div>'"
-      />`;
+    function showFlash(wasCorrect) {
+      const el = document.getElementById('flash');
+      if (flashTimer) clearTimeout(flashTimer);
+      el.textContent = wasCorrect ? '✓ ¡Correcto!' : '✗ Error';
+      el.className = 'feedback-flash ' + (wasCorrect ? 'flash-correct' : 'flash-wrong');
+      flashTimer = setTimeout(() => {
+        el.textContent = '';
+        el.className = 'feedback-flash';
+      }, 900);
     }
 
-    fetch(urlCSV)
-      .then(r => r.text())
-      .then(data => {
-        const rows = data.trim().split("\n");
-        const headers = rows[0].split(",");
-        const bodyRows = rows.slice(1);
-
-        const jugadores = bodyRows.map(fila => {
-          const celdas = fila.split(",");
-          return {
-            nombre: celdas[0].trim(),
-            puntos: parseInt(celdas[1]) || 0,
-            jornadas: celdas.slice(2).map(v => v.trim())
-          };
-        });
-
-        jugadores.sort((a, b) => b.puntos - a.puntos);
-
-        const jornHeaders = headers.slice(2);
-        const n = jugadores.length;
-
-        document.getElementById('subtitulo').textContent =
-          `${n} jugadores · Jornada actual: ${jornHeaders[jornHeaders.length - 1] || '—'}`;
-
-        // Cabeceras
-        document.getElementById('cabecera-fija').innerHTML = `
-          <tr>
-            <th style="width:4px;padding:0;"></th>
-            <th style="width:32px;">#</th>
-            <th style="text-align:left;">Jugador</th>
-            <th class="col-pts-h">Pts</th>
-          </tr>`;
-
-        document.getElementById('cabecera-scroll').innerHTML =
-          `<tr>${jornHeaders.map(h => `<th>${h}</th>`).join('')}</tr>`;
-
-        const tbodyFija   = document.getElementById('datos-fija');
-        const tbodyScroll = document.getElementById('datos-scroll');
-
-        jugadores.forEach((j, i) => {
-          const pos = i + 1;
-          let clase = 'mid';
-          if (i < 4) clase = `top-${i + 1}`;
-          else if (i >= n - 4) clase = `bottom-${n - i}`;
-
-          const sepClass = i === 4 ? ' separator' : '';
-          const color = AVATAR_COLORS[i % AVATAR_COLORS.length];
-
-          const jornadasHTML = j.jornadas.map(v => {
-            const isNP = v.toUpperCase() === 'NP' || v === '' || v === '-';
-            return `<td class="col-j${isNP ? ' np' : ''}">${v || '—'}</td>`;
-          }).join('');
-
-          tbodyFija.innerHTML += `
-            <tr class="${clase}${sepClass}">
-              <td class="col-bar"></td>
-              <td class="col-pos">${pos}</td>
-              <td class="col-name">
-                <div class="player-cell">
-                  ${avatarHTML(j.nombre, color)}
-                  <span>${j.nombre}</span>
-                </div>
-              </td>
-              <td class="col-pts">${j.puntos}</td>
-            </tr>`;
-
-          tbodyScroll.innerHTML += `
-            <tr class="${clase}${sepClass}">
-              ${jornadasHTML}
-            </tr>`;
-        });
-
-        // Sincronizar alturas de filas entre las dos tablas
-        syncRowHeights();
-      })
-      .catch(() => {
-        document.getElementById('subtitulo').textContent = 'Error al cargar los datos.';
-      });
-
-    function syncRowHeights() {
-      // Cabeceras
-      const thFija   = document.querySelectorAll('#cabecera-fija tr');
-      const thScroll = document.querySelectorAll('#cabecera-scroll tr');
-      thFija.forEach((row, i) => {
-        if (thScroll[i]) {
-          const h = Math.max(row.offsetHeight, thScroll[i].offsetHeight);
-          row.style.height = h + 'px';
-          thScroll[i].style.height = h + 'px';
-        }
-      });
-
-      // Filas de datos
-      const trFija   = document.querySelectorAll('#datos-fija tr');
-      const trScroll = document.querySelectorAll('#datos-scroll tr');
-      trFija.forEach((row, i) => {
-        if (trScroll[i]) {
-          const h = Math.max(row.offsetHeight, trScroll[i].offsetHeight);
-          row.style.height = h + 'px';
-          trScroll[i].style.height = h + 'px';
-        }
-      });
+    function answer(wasCorrect) {
+      if (correct + wrong >= TOTAL) return;
+      history.push(wasCorrect);
+      if (wasCorrect) correct++; else wrong++;
+      showFlash(wasCorrect);
+      update();
     }
+
+    function undoLast() {
+      if (history.length === 0) return;
+      const last = history.pop();
+      if (last) correct--; else wrong--;
+      update();
+    }
+
+    function resetAll() {
+      correct = 0; wrong = 0; history = [];
+      document.getElementById('flash').textContent = '';
+      document.getElementById('flash').className = 'feedback-flash';
+      update();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      const tag = document.activeElement.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (e.key === 'a' || e.key === 'A') answer(true);
+      if (e.key === 'e' || e.key === 'E') answer(false);
+      if (e.key === 'z' || e.key === 'Z') undoLast();
+    });
+
+    update();
   </script>
 </body>
 </html>
