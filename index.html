@@ -1,432 +1,415 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Test OPE — Contador de Aciertos</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora ELO · Mus Güsak</title>
+<style>
+  :root{
+    --bg: #F4F5F7;
+    --card: #FFFFFF;
+    --border: #E3E5E9;
+    --ink: #1D2129;
+    --ink-soft: #6B7280;
+    --blue: #2952CC;
+    --blue-soft: #EEF2FE;
+    --green: #1F8A4C;
+    --green-soft: #EAF7EF;
+    --red: #C23B3B;
+    --red-soft: #FCEEEE;
+    --radius: 10px;
+  }
+  *{ box-sizing: border-box; }
+  html, body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap{ max-width: 640px; margin: 0 auto; padding: 40px 20px 80px; }
 
-    :root {
-      --bg: #ffffff;
-      --bg-secondary: #f4f4f2;
-      --text: #1a1a1a;
-      --text-secondary: #6b6b68;
-      --text-tertiary: #9b9b97;
-      --border: rgba(0,0,0,0.12);
-      --border-secondary: rgba(0,0,0,0.22);
-      --radius-md: 8px;
-      --radius-lg: 12px;
-      --green: #1D9E75;
-      --green-bg: #E1F5EE;
-      --green-dark: #0F6E56;
-      --red: #D85A30;
-      --red-bg: #FAECE7;
-      --red-dark: #993C1D;
-    }
+  header{ margin-bottom: 28px; }
+  h1{ font-size: 24px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .subtitle{ font-size: 14.5px; color: var(--ink-soft); margin: 0; }
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #1c1c1a;
-        --bg-secondary: #2a2a28;
-        --text: #f0efe8;
-        --text-secondary: #a0a09a;
-        --text-tertiary: #6b6b65;
-        --border: rgba(255,255,255,0.1);
-        --border-secondary: rgba(255,255,255,0.2);
-        --green: #5DCAA5;
-        --green-bg: #04342C;
-        --green-dark: #9FE1CB;
-        --red: #F0997B;
-        --red-bg: #4A1B0C;
-        --red-dark: #F5C4B3;
-      }
-    }
+  .status{
+    display:flex; align-items:center; gap:8px;
+    font-size: 13px; color: var(--ink-soft);
+    margin-bottom: 20px;
+  }
+  .status .dot{ width:7px; height:7px; border-radius:50%; background:#C4C8D0; flex-shrink:0; }
+  .status.ok .dot{ background: var(--green); }
+  .status.error .dot{ background: var(--red); }
+  .status.error{ color: var(--red); }
 
-    body {
-      font-family: 'IBM Plex Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding: 2rem 1rem 4rem;
-    }
+  .card{
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card h2{
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    margin: 0 0 14px;
+  }
 
-    .container {
-      width: 100%;
-      max-width: 520px;
-    }
+  .field{ margin-bottom: 14px; }
+  .field:last-child{ margin-bottom: 0; }
+  .field label{
+    display:block;
+    font-size: 12.5px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .field.win label{ color: var(--green); }
+  .field.lose label{ color: var(--red); }
 
-    /* Header */
-    .ope-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 2rem;
-    }
+  select{
+    width: 100%;
+    font-size: 15px;
+    font-family: inherit;
+    padding: 11px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--ink);
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%236B7280" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 34px;
+  }
+  select:focus{ outline: none; border-color: var(--blue); background-color: #fff; }
 
-    .ope-label {
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-tertiary);
-      font-weight: 500;
-      margin-bottom: 4px;
-    }
+  .pair-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-    .score-number {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 96px;
-      line-height: 1;
-      color: var(--text);
-      letter-spacing: 0.01em;
-    }
+  .btn{
+    width: 100%;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    padding: 13px;
+    border-radius: 8px;
+    border: none;
+    background: var(--blue);
+    color: #fff;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+  .btn:hover{ background: #2145b0; }
+  .btn:active{ transform: translateY(1px); }
 
-    .score-number .score-total {
-      font-size: 36px;
-      color: var(--text-tertiary);
-    }
+  .error-msg{
+    font-size: 13.5px;
+    color: var(--red);
+    background: var(--red-soft);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-top: 12px;
+  }
 
-    .q-current {
-      font-size: 32px;
-      font-weight: 500;
-      line-height: 1.1;
-      text-align: right;
-    }
+  .result-row{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .result-row:last-child{ border-bottom: none; }
 
-    .question-counter-text {
-      font-size: 13px;
-      color: var(--text-secondary);
-      text-align: right;
-      margin-top: 4px;
-    }
+  .result-left{ display:flex; align-items:center; gap: 10px; min-width:0; }
+  .badge{
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 3px 8px;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+  .badge.win{ background: var(--green-soft); color: var(--green); }
+  .badge.lose{ background: var(--red-soft); color: var(--red); }
+  .result-name{ font-weight: 600; font-size: 15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
-    /* Stats */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 2rem;
-    }
+  .result-right{ display:flex; align-items:center; gap: 12px; flex-shrink:0; }
+  .delta{ font-size: 14px; font-weight: 700; min-width: 42px; text-align:right; }
+  .delta.up{ color: var(--green); }
+  .delta.down{ color: var(--red); }
+  .elo-change{ font-size: 13px; color: var(--ink-soft); white-space:nowrap; }
+  .elo-change .new{ color: var(--ink); font-weight: 600; }
 
-    .stat-card {
-      background: var(--bg-secondary);
-      border-radius: var(--radius-md);
-      padding: 0.75rem 1rem;
-    }
+  table{ width:100%; border-collapse: collapse; }
+  thead th{
+    text-align:left;
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--ink-soft);
+    padding: 6px 4px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  thead th.num{ text-align:right; }
+  tbody td{ padding: 8px 4px; font-size: 14.5px; border-bottom: 1px solid var(--border); }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody td.num{ text-align:right; font-weight: 600; }
+  tbody td.rank{ color: var(--ink-soft); width: 24px; }
 
-    .stat-value {
-      font-size: 22px;
-      font-weight: 500;
-      color: var(--text);
-    }
+  #resultCard{ display:none; }
 
-    .stat-value.green { color: var(--green); }
-    .stat-value.red   { color: var(--red); }
-
-    /* Progress */
-    .progress-wrap { margin-bottom: 2rem; }
-
-    .progress-bar-bg {
-      background: var(--bg-secondary);
-      border-radius: 100px;
-      height: 8px;
-      overflow: hidden;
-      margin-top: 8px;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      border-radius: 100px;
-      background: var(--text);
-      transition: width 0.3s ease;
-    }
-
-    .progress-labels {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-top: 6px;
-    }
-
-    /* Feedback flash */
-    .feedback-flash {
-      text-align: center;
-      font-size: 18px;
-      font-weight: 500;
-      height: 28px;
-      margin-bottom: 0.5rem;
-      transition: opacity 0.3s;
-    }
-
-    .flash-correct { color: var(--green); }
-    .flash-wrong   { color: var(--red); }
-
-    /* Buttons */
-    .buttons-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 1.25rem;
-    }
-
-    .btn {
-      border: 0.5px solid var(--border-secondary);
-      border-radius: var(--radius-lg);
-      padding: 1.25rem;
-      font-family: 'IBM Plex Sans', sans-serif;
-      font-size: 15px;
-      font-weight: 500;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      transition: background 0.12s, transform 0.1s;
-      background: var(--bg);
-      color: var(--text);
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .btn:active { transform: scale(0.97); }
-
-    .btn-correct { border-color: var(--green); color: var(--green); }
-    .btn-correct:hover { background: var(--green-bg); }
-
-    .btn-wrong { border-color: var(--red); color: var(--red); }
-    .btn-wrong:hover { background: var(--red-bg); }
-
-    .btn-secondary {
-      border-color: var(--border);
-      color: var(--text-secondary);
-      font-size: 13px;
-      padding: 0.7rem;
-      border-radius: var(--radius-md);
-    }
-
-    .btn-secondary:hover { background: var(--bg-secondary); }
-    .btn-secondary:disabled { opacity: 0.4; cursor: default; }
-
-    .actions-row { display: flex; gap: 10px; }
-    .actions-row .btn { flex: 1; }
-
-    /* Done banner */
-    .done-banner {
-      display: none;
-      background: var(--bg-secondary);
-      border-radius: var(--radius-lg);
-      padding: 1.5rem;
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-
-    .done-banner h2 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 48px;
-      margin: 0 0 4px;
-      color: var(--text);
-      font-weight: 400;
-    }
-
-    .done-banner p {
-      color: var(--text-secondary);
-      font-size: 14px;
-    }
-
-    .pct-badge {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 4px 14px;
-      border-radius: var(--radius-md);
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .pct-ok  { background: var(--green-bg); color: var(--green-dark); }
-    .pct-bad { background: var(--red-bg);   color: var(--red-dark); }
-
-    /* Keyboard hint */
-    .kbd-hint {
-      margin-top: 1.5rem;
-      text-align: center;
-      font-size: 12px;
-      color: var(--text-tertiary);
-    }
-
-    kbd {
-      display: inline-block;
-      padding: 1px 6px;
-      border: 0.5px solid var(--border-secondary);
-      border-radius: 4px;
-      font-family: monospace;
-      font-size: 11px;
-      color: var(--text-secondary);
-    }
-  </style>
+  @media (max-width: 420px){
+    .pair-grid{ grid-template-columns: 1fr; }
+  }
+</style>
 </head>
 <body>
-  <div class="container">
 
-    <div class="ope-header">
-      <div>
-        <div class="ope-label">Aciertos</div>
-        <div class="score-number" id="score-display">
-          0<span class="score-total">/100</span>
-        </div>
-      </div>
-      <div>
-        <div class="ope-label" style="text-align:right">Pregunta</div>
-        <div class="q-current" id="q-num">1</div>
-        <div class="question-counter-text">de 100</div>
-      </div>
-    </div>
+<div class="wrap">
 
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="ope-label">Aciertos</div>
-        <div class="stat-value green" id="stat-correct">0</div>
+  <header>
+    <h1>Calculadora ELO · Mus</h1>
+    <p class="subtitle">Elige la pareja ganadora y la perdedora. El cálculo sale al momento.</p>
+  </header>
+
+  <p class="status" id="status"><span class="dot"></span><span id="statusText">Cargando jugadores…</span></p>
+
+  <div class="card">
+    <h2>Pareja ganadora</h2>
+    <div class="pair-grid">
+      <div class="field win">
+        <label for="win1">Jugador 1</label>
+        <select id="win1"><option value="">Selecciona…</option></select>
       </div>
-      <div class="stat-card">
-        <div class="ope-label">Errores</div>
-        <div class="stat-value red" id="stat-wrong">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="ope-label">Quedan</div>
-        <div class="stat-value" id="stat-left">100</div>
+      <div class="field win">
+        <label for="win2">Jugador 2</label>
+        <select id="win2"><option value="">Selecciona…</option></select>
       </div>
     </div>
-
-    <div class="progress-wrap">
-      <div class="ope-label">Progreso</div>
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
-      </div>
-      <div class="progress-labels">
-        <span id="pct-label">0%</span>
-        <span id="pct-correct-label">— aciertos</span>
-      </div>
-    </div>
-
-    <div class="done-banner" id="done-banner">
-      <h2>¡Test completado!</h2>
-      <p id="done-text">Has respondido las 100 preguntas.</p>
-      <span class="pct-badge" id="done-badge"></span>
-    </div>
-
-    <div class="feedback-flash" id="flash"></div>
-
-    <div class="buttons-row" id="main-buttons">
-      <button class="btn btn-correct" id="btn-correct" onclick="answer(true)">
-        <i class="ti ti-check" style="font-size:22px" aria-hidden="true"></i>
-        Acierto
-      </button>
-      <button class="btn btn-wrong" id="btn-wrong" onclick="answer(false)">
-        <i class="ti ti-x" style="font-size:22px" aria-hidden="true"></i>
-        Error
-      </button>
-    </div>
-
-    <div class="actions-row">
-      <button class="btn btn-secondary" id="btn-undo" onclick="undoLast()" disabled>
-        <i class="ti ti-arrow-back-up" style="font-size:16px" aria-hidden="true"></i> Deshacer
-      </button>
-      <button class="btn btn-secondary" onclick="resetAll()">
-        <i class="ti ti-refresh" style="font-size:16px" aria-hidden="true"></i> Reiniciar
-      </button>
-    </div>
-
-    <p class="kbd-hint">
-      <kbd>A</kbd> Acierto &nbsp;·&nbsp; <kbd>E</kbd> Error &nbsp;·&nbsp; <kbd>Z</kbd> Deshacer
-    </p>
-
   </div>
 
-  <script>
-    const TOTAL = 100;
-    let correct = 0, wrong = 0, history = [];
-    let flashTimer = null;
+  <div class="card">
+    <h2>Pareja perdedora</h2>
+    <div class="pair-grid">
+      <div class="field lose">
+        <label for="lose1">Jugador 1</label>
+        <select id="lose1"><option value="">Selecciona…</option></select>
+      </div>
+      <div class="field lose">
+        <label for="lose2">Jugador 2</label>
+        <select id="lose2"><option value="">Selecciona…</option></select>
+      </div>
+    </div>
+    <button class="btn" id="calcBtn">Calcular</button>
+    <p class="error-msg" id="errorMsg" style="display:none;"></p>
+  </div>
 
-    function update() {
-      const answered = correct + wrong;
-      const left = TOTAL - answered;
-      const pct = Math.round((answered / TOTAL) * 100);
-      const pctCorrect = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+  <div class="card" id="resultCard">
+    <h2>Resultado</h2>
+    <div id="resultBody"></div>
+  </div>
 
-      document.getElementById('score-display').innerHTML =
-        correct + '<span class="score-total">/' + TOTAL + '</span>';
-      document.getElementById('q-num').textContent = Math.min(answered + 1, TOTAL);
-      document.getElementById('stat-correct').textContent = correct;
-      document.getElementById('stat-wrong').textContent = wrong;
-      document.getElementById('stat-left').textContent = left;
-      document.getElementById('progress-fill').style.width = pct + '%';
-      document.getElementById('pct-label').textContent = pct + '%';
-      document.getElementById('pct-correct-label').textContent =
-        answered > 0 ? pctCorrect + '% de acierto' : '— aciertos';
+  <div class="card">
+    <h2>Ranking actual</h2>
+    <table>
+      <thead>
+        <tr><th class="rank">#</th><th>Jugador</th><th class="num">ELO</th></tr>
+      </thead>
+      <tbody id="rankingBody">
+        <tr><td colspan="3" style="color:var(--ink-soft);">Sin datos todavía</td></tr>
+      </tbody>
+    </table>
+  </div>
 
-      const done = answered >= TOTAL;
-      document.getElementById('main-buttons').style.display = done ? 'none' : 'grid';
-      document.getElementById('done-banner').style.display = done ? 'block' : 'none';
+</div>
 
-      if (done) {
-        const finalPct = Math.round((correct / TOTAL) * 100);
-        const badge = document.getElementById('done-badge');
-        badge.textContent = finalPct + '% de acierto — ' + correct + ' correctas, ' + wrong + ' errores';
-        badge.className = 'pct-badge ' + (finalPct >= 60 ? 'pct-ok' : 'pct-bad');
-      }
+<script>
+/* ============================================================
+   Fuente de datos: Google Sheet publicada como CSV.
+   Columnas esperadas: Jugador, ELO
+   ============================================================ */
+const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS6FZZe3x0lW1-5EIl1J64CM087PlaEpSKGznZ8CNOFwFqZdpIN36zzz3pZAziH9SASn8cbe0-ZQ1zQ/pub?gid=1765204250&single=true&output=csv";
 
-      const undoBtn = document.getElementById('btn-undo');
-      undoBtn.disabled = history.length === 0;
+const K_TEAM = 32;
+let PLAYERS = [];
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
+      else if (c === '"') { inQuotes = false; }
+      else { field += c; }
+    } else {
+      if (c === '"') inQuotes = true;
+      else if (c === ',') { row.push(field); field = ""; }
+      else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ""; }
+      else if (c === '\r') { /* skip */ }
+      else field += c;
     }
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows.filter(r => r.some(cell => cell.trim() !== ""));
+}
 
-    function showFlash(wasCorrect) {
-      const el = document.getElementById('flash');
-      if (flashTimer) clearTimeout(flashTimer);
-      el.textContent = wasCorrect ? '✓ ¡Correcto!' : '✗ Error';
-      el.className = 'feedback-flash ' + (wasCorrect ? 'flash-correct' : 'flash-wrong');
-      flashTimer = setTimeout(() => {
-        el.textContent = '';
-        el.className = 'feedback-flash';
-      }, 900);
+function rowsToPlayers(rows) {
+  const [header, ...body] = rows;
+  const norm = h => h.trim().toLowerCase();
+  const iNombre = header.findIndex(h => ["jugador", "nombre"].includes(norm(h)));
+  const iElo = header.findIndex(h => norm(h) === "elo");
+  return body
+    .map(r => ({ nombre: r[iNombre]?.trim(), elo: parseFloat(r[iElo]) }))
+    .filter(p => p.nombre && !isNaN(p.elo));
+}
+
+function expected(rSelf, rOpp) {
+  return 1 / (1 + Math.pow(10, (rOpp - rSelf) / 400));
+}
+
+// Reparte el delta total de la pareja entre sus dos integrantes,
+// combinando el ELO propio y el de la pareja rival.
+function splitPairDelta(r1, r2, teamDelta, opponentAvg, score) {
+  const e1 = expected(r1, opponentAvg);
+  const e2 = expected(r2, opponentAvg);
+  const raw1 = K_TEAM * (score - e1);
+  const raw2 = K_TEAM * (score - e2);
+  const sumRaw = raw1 + raw2;
+  if (Math.abs(sumRaw) < 1e-9 || Math.sign(sumRaw) !== Math.sign(teamDelta || sumRaw)) {
+    return [teamDelta / 2, teamDelta / 2];
+  }
+  const scale = teamDelta / sumRaw;
+  return [raw1 * scale, raw2 * scale];
+}
+
+function calcularPartida(winners, losers) {
+  const rW = (winners[0].elo + winners[1].elo) / 2;
+  const rL = (losers[0].elo + losers[1].elo) / 2;
+  const eW = expected(rW, rL);
+  const eL = 1 - eW;
+  const teamDeltaW = K_TEAM * (1 - eW);
+  const teamDeltaL = K_TEAM * (0 - eL);
+  const [dW1, dW2] = splitPairDelta(winners[0].elo, winners[1].elo, teamDeltaW, rL, 1);
+  const [dL1, dL2] = splitPairDelta(losers[0].elo, losers[1].elo, teamDeltaL, rW, 0);
+  return [
+    { ...winners[0], delta: dW1, lado: "win" },
+    { ...winners[1], delta: dW2, lado: "win" },
+    { ...losers[0], delta: dL1, lado: "lose" },
+    { ...losers[1], delta: dL2, lado: "lose" },
+  ];
+}
+
+function fmtSigned(n) {
+  const r = Math.round(n);
+  return (r > 0 ? "+" : "") + r;
+}
+
+function renderRanking(players) {
+  const tbody = document.getElementById("rankingBody");
+  if (!players.length) {
+    tbody.innerHTML = `<tr><td colspan="3" style="color:var(--ink-soft);">Sin datos todavía</td></tr>`;
+    return;
+  }
+  const sorted = [...players].sort((a, b) => b.elo - a.elo);
+  tbody.innerHTML = sorted.map((p, i) => `
+    <tr>
+      <td class="rank">${i + 1}</td>
+      <td>${p.nombre}</td>
+      <td class="num">${Math.round(p.elo)}</td>
+    </tr>`).join("");
+}
+
+function fillSelects(players) {
+  const options = `<option value="">Selecciona…</option>` +
+    players
+      .slice()
+      .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))
+      .map(p => `<option value="${p.nombre}">${p.nombre}</option>`).join("");
+  ["win1", "win2", "lose1", "lose2"].forEach(id => {
+    document.getElementById(id).innerHTML = options;
+  });
+}
+
+function renderResult(results) {
+  const card = document.getElementById("resultCard");
+  const body = document.getElementById("resultBody");
+  card.style.display = "block";
+  body.innerHTML = results.map(p => {
+    const newElo = p.elo + p.delta;
+    const deltaClass = p.delta >= 0 ? "up" : "down";
+    return `<div class="result-row">
+      <div class="result-left">
+        <span class="badge ${p.lado}">${p.lado === "win" ? "Gana" : "Pierde"}</span>
+        <span class="result-name">${p.nombre}</span>
+      </div>
+      <div class="result-right">
+        <span class="delta ${deltaClass}">${fmtSigned(p.delta)}</span>
+        <span class="elo-change">${Math.round(p.elo)} → <span class="new">${Math.round(newElo)}</span></span>
+      </div>
+    </div>`;
+  }).join("");
+  card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function showError(msg) {
+  const el = document.getElementById("errorMsg");
+  el.style.display = msg ? "block" : "none";
+  el.textContent = msg || "";
+}
+
+function setStatus(text, kind) {
+  const bar = document.getElementById("status");
+  const label = document.getElementById("statusText");
+  bar.classList.remove("ok", "error");
+  if (kind) bar.classList.add(kind);
+  label.textContent = text;
+}
+
+document.getElementById("calcBtn").addEventListener("click", () => {
+  document.getElementById("resultCard").style.display = "none";
+  const ids = ["win1", "win2", "lose1", "lose2"];
+  const names = ids.map(id => document.getElementById(id).value);
+
+  if (names.some(n => !n)) { showError("Selecciona los 4 jugadores."); return; }
+  if (new Set(names).size !== 4) { showError("No puedes repetir el mismo jugador en dos huecos."); return; }
+
+  const byName = n => PLAYERS.find(p => p.nombre === n);
+  const winners = [byName(names[0]), byName(names[1])];
+  const losers = [byName(names[2]), byName(names[3])];
+
+  showError(null);
+  renderResult(calcularPartida(winners, losers));
+});
+
+async function init() {
+  try {
+    setStatus("Cargando jugadores…");
+    const res = await fetch(SHEET_CSV_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    PLAYERS = rowsToPlayers(parseCSV(text));
+
+    if (!PLAYERS.length) {
+      setStatus("La hoja se ha cargado pero no hay jugadores válidos", "error");
+      return;
     }
+    renderRanking(PLAYERS);
+    fillSelects(PLAYERS);
+    setStatus(`${PLAYERS.length} jugadores cargados`, "ok");
+  } catch (err) {
+    console.error(err);
+    setStatus("No se han podido cargar los datos de la hoja.", "error");
+  }
+}
 
-    function answer(wasCorrect) {
-      if (correct + wrong >= TOTAL) return;
-      history.push(wasCorrect);
-      if (wasCorrect) correct++; else wrong++;
-      showFlash(wasCorrect);
-      update();
-    }
-
-    function undoLast() {
-      if (history.length === 0) return;
-      const last = history.pop();
-      if (last) correct--; else wrong--;
-      update();
-    }
-
-    function resetAll() {
-      correct = 0; wrong = 0; history = [];
-      document.getElementById('flash').textContent = '';
-      document.getElementById('flash').className = 'feedback-flash';
-      update();
-    }
-
-    document.addEventListener('keydown', (e) => {
-      const tag = document.activeElement.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-      if (e.key === 'a' || e.key === 'A') answer(true);
-      if (e.key === 'e' || e.key === 'E') answer(false);
-      if (e.key === 'z' || e.key === 'Z') undoLast();
-    });
-
-    update();
-  </script>
+init();
+</script>
 </body>
 </html>
